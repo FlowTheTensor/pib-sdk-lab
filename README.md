@@ -35,48 +35,7 @@ docker-compose --profile proxy up
 
 - **Jupyter Lab:** <http://localhost:8888> ⭐ **Hauptzugang**
 - **Cerebra Frontend:** <http://localhost:4200> 🧠 **Roboter-UI**
-- **PIB Application:** <http://localhost:8000>
 - **Dashboard:** Öffnen Sie `dashboard.html` im Browser
-
-### Mit Nginx Proxy (benutzerfreundlich)
-
-- **Jupyter Lab:** <http://localhost> (Root-Pfad)
-- **Cerebra:** <http://localhost/cerebra>
-- **PIB App:** <http://localhost/app>
-- **Health Check:** <http://localhost/health>
-
-### Entwicklungs-URLs
-
-- **Dev Jupyter:** <http://localhost:8889>
-- **Dedicated Jupyter:** <http://localhost:8890>
-- **Cerebra Dev:** <http://localhost:4202> (Live-Reload)
-
-## Verfügbare Services
-
-### 1. Haupt-Service (`pib-sdk`)
-
-- Läuft standardmäßig
-- Jupyter verfügbar auf Port 8888
-- Hauptanwendung auf Port 8000
-- Cerebra Frontend auf Port 4200
-
-### 2. Cerebra Services
-
-- **Production Build:** Aktivierung mit `--profile cerebra-prod` (Port 4201)
-- **Development Mode:** Aktivierung mit `--profile cerebra-dev` (Port 4202, Live-Reload)
-- **Integriert:** Läuft automatisch im Haupt-Container auf Port 4200
-
-### 3. Development-Service (`pib-dev`)
-
-- Aktivierung mit `--profile dev`
-- Interaktive Bash-Shell
-- Jupyter auf Port 8889
-
-### 4. Dedicated Jupyter Service (`jupyter`)
-
-- Aktivierung mit `--profile jupyter`
-- Nur Jupyter Lab
-- Port 8890
 
 ## Nützliche Befehle
 
@@ -187,4 +146,5 @@ docker exec -it pib-sdk-container pip install paket-name
 
 # Oder requirements.txt erweitern und neu bauen
 docker-compose build
+
 ```
