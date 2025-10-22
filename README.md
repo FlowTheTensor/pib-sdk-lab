@@ -29,6 +29,11 @@ docker-compose up pib-sdk
 docker-compose --profile proxy up
 ```
 
+## Container starten
+```bash
+docker run -d --name pib-sdk-container -p 8888:8888 -p 4200:4200 -p 8000:8000 -p 8080:8080 -p 11311:11311 pib-sdk-lab
+```
+
 ## Zugriffsmöglichkeiten
 
 ### Standard-URLs (nach Container-Start)
@@ -148,3 +153,4 @@ docker exec -it pib-sdk-container pip install paket-name
 docker-compose build
 
 ```
+
