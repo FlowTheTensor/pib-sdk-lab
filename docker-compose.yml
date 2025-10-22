@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  pib-sdk:
+    image: pib-sdk-lab:latest  # Use pre-built image
+    container_name: pib-sdk-container
+    volumes:
+      # Persist any notebooks if needed
+      - pib-data:/app/notebooks
+    ports:
+      # Expose ports for web applications and Jupyter
+      - "8000:8000"   # Your main application
+      - "8080:8080"   # Alternative web service
+      - "8888:8888"   # Jupyter Notebook/Lab
+      - "11311:11311" # ROS Master
+      - "4200:4200"   # Cerebra Angular Frontend
+    environment:
+      - PYTHONPATH=/app:/opt/ros/noetic/lib/python3/dist-packages
+      - ROS_MASTER_URI=http://localhost:11311
+      - ROS_HOSTNAME=localhost
+      - DISPLAY=${DISPLAY:-:0}  # For GUI applications if needed
+    # Uncomment if you need GPU access
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+    # The conflict-free Dockerfile has its own startup logic
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    networks:
+      - pib-network
+
+  # Optional: Add a development service with different entrypoint
+  pib-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pib-sdk-dev
+    volumes:
+      - .:/app
+    ports:
+      - "8001:8000"   # Alternative main port
+      - "8889:8888"   # Alternative Jupyter port
+    environment:
+      - PYTHONPATH=/app
+      - ENVIRONMENT=development
+    command: /bin/bash
+    stdin_open: true
+    tty: true
+    networks:
+      - pib-network
+    profiles:
+      - dev
+
+  # Jupyter service for easy development
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pib-jupyter
+    volumes:
+      - .:/app
+    ports:
+      - "8890:8888"   # Dedicated Jupyter port
+    environment:
+      - PYTHONPATH=/app
+      - JUPYTER_ENABLE_LAB=yes
+    command: jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --notebook-dir=/app
+    networks:
+      - pib-network
+    profiles:
+      - jupyter
+
+  # Cerebra Frontend Development Service (Alternative port)
+  cerebra-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cerebra-frontend
+    ports:
+      - "4202:4200"   # Cerebra Development Server (alternative port)
+    working_dir: /app/cerebra
+    command: npm run start -- --host=0.0.0.0 --port=4200
+    environment:
+      - NODE_ENV=development
+    networks:
+      - pib-network
+    profiles:
+      - cerebra-dev
+
+  # Nginx Reverse Proxy für benutzerfreundliche URLs
+  pib-sdk-lab:
+    image: nginx:alpine
+    container_name: pib-sdk-lab
+    ports:
+      - "80:80"     # Standard HTTP Port für pib-sdk-lab
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - pib-sdk
+    networks:
+      - pib-network
+    profiles:
+      - proxy
+
+volumes:
+  pib-data:
+
+networks:
+  pib-network:
+    driver: bridge

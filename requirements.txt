@@ -1,0 +1,62 @@
+# Compatible requirements for PIB SDK with Python 3.9
+# Core scientific computing packages with compatible versions
+numpy==1.24.3
+scipy==1.10.1
+matplotlib==3.7.2
+
+# Robotics packages
+roboticstoolbox-python==1.1.0
+spatialmath-python==1.1.14
+spatialgeometry==1.1.0
+pgraph-python==0.6.3
+swift-sim==1.1.0
+rtb-data==1.0.1
+
+# Computer vision
+opencv-python==4.8.1.78
+opencv-contrib-python==4.8.1.78
+pillow==10.0.1
+
+# PIB SDK
+pib-sdk==0.2
+
+# Communication and networking
+websockets==11.0.3
+roslibpy==2.0.0
+autobahn==23.6.2
+twisted==23.8.0
+
+# ROS Python packages (installed via ROS, listed for reference)
+# rospy (from ROS installation)
+# rosgraph (from ROS installation)  
+# roslaunch (from ROS installation)
+# geometry_msgs (from ROS installation)
+# sensor_msgs (from ROS installation)
+# std_msgs (from ROS installation)
+
+# Utilities
+# pyyaml==6.0.1  # Installed separately due to ROS conflict
+ansitable==0.11.4
+colored==2.3.1
+progress==1.6.1
+python-dateutil==2.8.2
+
+# Audio (if needed)
+sounddevice==0.4.6
+
+# Web-based development tools
+jupyter==1.0.0
+jupyterlab==4.0.7
+notebook==7.0.6
+ipywidgets==8.1.1
+
+# Enhanced visualization for browser
+plotly==5.17.0
+bokeh==3.3.0
+
+# Machine Learning (if needed)
+# Uncomment if you need these packages
+# jax==0.4.13
+# jaxlib==0.4.13
+# mediapipe==0.10.3
+# depthai==2.21.2.0

@@ -1,2 +1,190 @@
-# pib-sdk-lab
-using pib-sdk in Jupyter with Python 3.9 Cerebra for webbased GUI for robot-control
+# PIB SDK Docker Lab + Cerebra - Vollständige Robotics-Entwicklungsumgebung
+
+Dieses Projekt ermöglicht es Ihnen, mit Python, ROS und der Cerebra-Weboberfläche aus dem Docker-Container heraus im Browser zu arbeiten. Der Container enthält ROS Noetic, Jupyter Lab für interaktive Entwicklung und das Cerebra Angular Frontend für die Roboter-Benutzeroberfläche.
+
+## Schnellstart - OHNE Admin-Rechte! 🚀
+
+### Option 1: Einfaches PowerShell Script (Empfohlen)
+```powershell
+# Alles in einem - startet Container und öffnet Browser
+.\start-pib-lab.ps1
+
+# Oder mit benutzerfreundlicher URL über Proxy
+.\start-pib-lab.ps1 start-proxy
+```
+
+### Option 2: Dashboard verwenden
+```powershell
+# Öffnen Sie dashboard.html in Ihrem Browser
+# Speichern Sie es als Lesezeichen für einfachen Zugriff!
+start .\dashboard.html
+```
+
+### Option 3: Manuell mit Docker Compose
+```bash
+# Basis-Container mit Jupyter
+docker-compose up pib-sdk
+
+# Mit Nginx Proxy für benutzerfreundliche URLs
+docker-compose --profile proxy up
+```
+
+## Zugriffsmöglichkeiten
+
+### Standard-URLs (nach Container-Start)
+
+- **Jupyter Lab:** <http://localhost:8888> ⭐ **Hauptzugang**
+- **Cerebra Frontend:** <http://localhost:4200> 🧠 **Roboter-UI**
+- **PIB Application:** <http://localhost:8000>
+- **Dashboard:** Öffnen Sie `dashboard.html` im Browser
+
+### Mit Nginx Proxy (benutzerfreundlich)
+
+- **Jupyter Lab:** <http://localhost> (Root-Pfad)
+- **Cerebra:** <http://localhost/cerebra>
+- **PIB App:** <http://localhost/app>
+- **Health Check:** <http://localhost/health>
+
+### Entwicklungs-URLs
+
+- **Dev Jupyter:** <http://localhost:8889>
+- **Dedicated Jupyter:** <http://localhost:8890>
+- **Cerebra Dev:** <http://localhost:4202> (Live-Reload)
+
+## Verfügbare Services
+
+### 1. Haupt-Service (`pib-sdk`)
+
+- Läuft standardmäßig
+- Jupyter verfügbar auf Port 8888
+- Hauptanwendung auf Port 8000
+- Cerebra Frontend auf Port 4200
+
+### 2. Cerebra Services
+
+- **Production Build:** Aktivierung mit `--profile cerebra-prod` (Port 4201)
+- **Development Mode:** Aktivierung mit `--profile cerebra-dev` (Port 4202, Live-Reload)
+- **Integriert:** Läuft automatisch im Haupt-Container auf Port 4200
+
+### 3. Development-Service (`pib-dev`)
+
+- Aktivierung mit `--profile dev`
+- Interaktive Bash-Shell
+- Jupyter auf Port 8889
+
+### 4. Dedicated Jupyter Service (`jupyter`)
+
+- Aktivierung mit `--profile jupyter`
+- Nur Jupyter Lab
+- Port 8890
+
+## Nützliche Befehle
+
+### Container Management
+```bash
+# Alle Services starten
+docker-compose up
+
+# Nur bestimmten Service starten
+docker-compose up pib-sdk
+
+# Im Hintergrund starten
+docker-compose up -d
+
+# Services stoppen
+docker-compose down
+
+# Container neu bauen
+docker-compose build
+
+# Cerebra Services starten
+docker-compose --profile cerebra-dev up    # Development Mode
+docker-compose --profile cerebra-prod up   # Production Build
+```
+
+### Interaktive Shell im Container
+```bash
+# In laufenden Container einsteigen
+docker exec -it pib-sdk-container /bin/bash
+
+# Development-Container mit Shell starten
+docker-compose --profile dev run pib-dev /bin/bash
+```
+
+### Jupyter manuell starten
+```bash
+# Im Container:
+./start_jupyter.sh
+
+# Oder direkt:
+jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root
+```
+
+## Installierte Pakete
+
+### Wissenschaftliche Bibliotheken
+- NumPy, SciPy, Matplotlib
+- OpenCV für Computer Vision
+- Pillow für Bildverarbeitung
+
+### Robotik & ROS
+
+- **ROS Noetic** (Robot Operating System)
+- Robotics Toolbox Python
+- Spatial Math Python
+- PIB SDK
+- ROS Python Libraries (rospy, geometry_msgs, sensor_msgs, etc.)
+
+### Web-Entwicklung
+
+- Jupyter Lab/Notebook
+- IPython Widgets
+- Plotly (interaktive Plots)
+- Bokeh (Datenvisualisierung)
+
+### Roboter Frontend (Cerebra)
+
+- **Angular 18** Frontend für PIB-Roboter
+- **Material Design** Benutzeroberfläche
+- **ROS Integration** über roslib
+- **Live-Development** mit Hot-Reload
+
+### Kommunikation
+
+- WebSockets
+- ROS LibPy
+- ROS Topics, Services & Actions
+
+## Tipps
+
+1. **Kein Token/Passwort:** Jupyter ist für lokale Entwicklung ohne Authentifizierung konfiguriert
+2. **Live-Reload:** Ihr Code-Verzeichnis ist als Volume gemountet - Änderungen werden sofort übernommen
+3. **Port-Konflikte:** Falls ein Port belegt ist, können Sie ihn in `docker-compose.yml` ändern
+4. **GPU-Unterstützung:** Uncommentieren Sie die GPU-Konfiguration in `docker-compose.yml` falls benötigt
+
+## Troubleshooting
+
+### Jupyter startet nicht
+```bash
+# Logs anschauen
+docker-compose logs pib-sdk
+
+# Container neu starten
+docker-compose restart pib-sdk
+```
+
+### Port bereits belegt
+```bash
+# Andere Ports in docker-compose.yml verwenden, z.B.:
+ports:
+  - "9999:8888"  # Dann http://localhost:9999
+```
+
+### Packages fehlen
+```bash
+# In den Container einsteigen und installieren
+docker exec -it pib-sdk-container pip install paket-name
+
+# Oder requirements.txt erweitern und neu bauen
+docker-compose build
+```
