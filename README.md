@@ -2,7 +2,7 @@
 
 Dieses Projekt ermöglicht es Ihnen, mit Python, ROS und der Cerebra-Weboberfläche aus dem Docker-Container heraus im Browser zu arbeiten. Der Container enthält ROS Noetic, Jupyter Lab für interaktive Entwicklung und das Cerebra Angular Frontend für die Roboter-Benutzeroberfläche.
 
-## Schnellstart - OHNE Admin-Rechte! 🚀
+🚀
 
 ### Image bauen
 ```bash
@@ -139,5 +139,6 @@ docker exec -it pib-sdk-container pip install paket-name
 docker-compose build
 
 ```
+
 
 
