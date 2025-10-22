@@ -4,29 +4,9 @@ Dieses Projekt ermöglicht es Ihnen, mit Python, ROS und der Cerebra-Weboberflä
 
 ## Schnellstart - OHNE Admin-Rechte! 🚀
 
-### Option 1: Einfaches PowerShell Script (Empfohlen)
-```powershell
-# Alles in einem - startet Container und öffnet Browser
-.\start-pib-lab.ps1
-
-# Oder mit benutzerfreundlicher URL über Proxy
-.\start-pib-lab.ps1 start-proxy
-```
-
-### Option 2: Dashboard verwenden
-```powershell
-# Öffnen Sie dashboard.html in Ihrem Browser
-# Speichern Sie es als Lesezeichen für einfachen Zugriff!
-start .\dashboard.html
-```
-
-### Option 3: Manuell mit Docker Compose
+### Image bauen
 ```bash
-# Basis-Container mit Jupyter
-docker-compose up pib-sdk
-
-# Mit Nginx Proxy für benutzerfreundliche URLs
-docker-compose --profile proxy up
+docker-compose build
 ```
 
 ## Container starten
@@ -41,6 +21,12 @@ docker run -d --name pib-sdk-container -p 8888:8888 -p 4200:4200 -p 8000:8000 -p
 - **Jupyter Lab:** <http://localhost:8888> ⭐ **Hauptzugang**
 - **Cerebra Frontend:** <http://localhost:4200> 🧠 **Roboter-UI**
 - **Dashboard:** Öffnen Sie `dashboard.html` im Browser
+
+```powershell
+# Öffnen Sie dashboard.html in Ihrem Browser
+# Speichern Sie es als Lesezeichen für einfachen Zugriff!
+start .\dashboard.html
+```
 
 ## Nützliche Befehle
 
@@ -153,4 +139,5 @@ docker exec -it pib-sdk-container pip install paket-name
 docker-compose build
 
 ```
+
 
