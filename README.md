@@ -2,16 +2,34 @@
 
 Dieses Projekt ermöglicht es Ihnen, mit Python, ROS und der Cerebra-Weboberfläche aus dem Docker-Container heraus im Browser zu arbeiten. Der Container enthält ROS Noetic, Jupyter Lab für interaktive Entwicklung und das Cerebra Angular Frontend für die Roboter-Benutzeroberfläche.
 
+Systemvoraussetzungen:
+- Docker Desktop
+- min. 12 GB Festplattenplatz
+
 🚀
 
 ### Image bauen
+Im Terminal eingeben im Projektpfad, also in dem Ordner, in dem die Dateien docker-compose.yml und Dockerfile liegen:
 ```bash
 docker-compose build
+```
+oder
+```bash
+docker build -t pib-sdk-lab:latest .
 ```
 
 ## Container starten
 ```bash
+docker-compose up -d 
+```
+```bash
 docker run -d --name pib-sdk-container -p 8888:8888 -p 4200:4200 -p 8000:8000 -p 8080:8080 -p 11311:11311 pib-sdk-lab
+```
+Danach kann über das Dashboard geschaut werden, ob die Dienste laufen und man kann diese direkt im Browser starten
+```powershell
+# Öffnen Sie dashboard.html in Ihrem Browser
+# Speichern Sie es als Lesezeichen für einfachen Zugriff!
+start .\dashboard.html
 ```
 
 ## Zugriffsmöglichkeiten
@@ -21,12 +39,6 @@ docker run -d --name pib-sdk-container -p 8888:8888 -p 4200:4200 -p 8000:8000 -p
 - **Jupyter Lab:** <http://localhost:8888> ⭐ **Hauptzugang**
 - **Cerebra Frontend:** <http://localhost:4200> 🧠 **Roboter-UI**
 - **Dashboard:** Öffnen Sie `dashboard.html` im Browser
-
-```powershell
-# Öffnen Sie dashboard.html in Ihrem Browser
-# Speichern Sie es als Lesezeichen für einfachen Zugriff!
-start .\dashboard.html
-```
 
 ## Nützliche Befehle
 
@@ -139,6 +151,7 @@ docker exec -it pib-sdk-container pip install paket-name
 docker-compose build
 
 ```
+
 
 
 
