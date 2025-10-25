@@ -15,13 +15,14 @@ docker-compose build
 ```
 oder
 ```bash
-docker build -t pib-sdk-lab:latest .
+docker build -t pib-sdk-lab:latest
 ```
 
 ## Container starten
 ```bash
 docker-compose up -d 
 ```
+oder
 ```bash
 docker run -d --name pib-sdk-container -p 8888:8888 -p 4200:4200 -p 8000:8000 -p 8080:8080 -p 11311:11311 pib-sdk-lab
 ```
@@ -151,6 +152,7 @@ docker exec -it pib-sdk-container pip install paket-name
 docker-compose build
 
 ```
+
 
 
 
