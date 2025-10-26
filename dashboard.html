@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PIB-SDK CEREBRA - Dashboard</title>
+    <title>PIB-SDK - Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
     <style>
@@ -363,6 +363,7 @@
             
             checkService('http://localhost:8888', 'jupyter-status');
             checkService('http://localhost:4200', 'cerebra-status');
+            checkService('http://localhost:4201', 'digitwin-status');
         }
 
         function startRefreshTimer() {
@@ -414,10 +415,10 @@
 <body>
     <div class="main-container">
         <div class="cerebra-container">
-            <h1 class="cerebra-title">🤖 pib-sdk und Cerebra 🤖</h1>
+            <h1 class="cerebra-title">🤖 pib-sdk Lab 🤖</h1>
             
             <div class="cerebra-subtitle">
-                <p>Basierend auf ROS Noetic und Python 3.9</p>
+                <p>Basierend auf Ubuntu 24.04 LTS, ROS2 und Python 3.11</p>
             </div>
 
             <div class="service-grid">
@@ -438,6 +439,16 @@
                     <div class="service-title">Cerebra Frontend</div>
                     <div class="service-description">
                         Angular-basierte Oberfläche zur intuitiven Steuerung des pib
+                    </div>
+                </a>
+
+                <a href="http://localhost:4201" class="service-card" target="_blank" rel="noopener">
+                    <div class="service-icon">
+                        <i class="bi bi-diagram-3"></i>
+                    </div>
+                    <div class="service-title">Digitaler Zwilling</div>
+                    <div class="service-description">
+                        Digital-Twin Studio für Webots-Simulation und 3D-CAD Integration
                     </div>
                 </a>
             </div>
@@ -469,6 +480,13 @@
                             <i class="bi bi-cpu me-2"></i>Cerebra Frontend
                         </div>
                         <div class="status-value" id="cerebra-status">🟡 Checking...</div>
+                    </div>
+                    
+                    <div class="status-item">
+                        <div class="status-label">
+                            <i class="bi bi-diagram-3 me-2"></i>Digitaler Zwilling
+                        </div>
+                        <div class="status-value" id="digitwin-status">🟡 Checking...</div>
                     </div>
                 </div>
                 

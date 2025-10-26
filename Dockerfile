@@ -91,6 +91,17 @@ RUN /opt/pib-venv/bin/pip install --no-cache-dir \
     colored \
     progress
 
+# Clone Digi-Twin Studio from GitHub (original files)
+WORKDIR /app
+RUN git clone https://github.com/pib-rocks/digi-twin-studio.git digi-twin-studio
+
+# Install Digi-Twin Studio dependencies
+WORKDIR /app/digi-twin-studio
+RUN npm install
+
+# Return to main app directory  
+WORKDIR /app
+
 # Copy test notebook for Jupyter
 COPY test_notebook.ipynb /app/
 
@@ -139,6 +150,12 @@ RUN echo '#!/bin/bash' > /root/start_pib.sh && \
     echo '# Start Cerebra Angular Frontend in background' >> /root/start_pib.sh && \
     echo 'cd /app/cerebra && nohup ./node_modules/.bin/ng serve --host=0.0.0.0 --port=4200 --disable-host-check --configuration development,rosmock > /tmp/angular.log 2>&1 &' >> /root/start_pib.sh && \
     echo '' >> /root/start_pib.sh && \
+    echo '# Start Digi-Twin Studio Proxy Server in background' >> /root/start_pib.sh && \
+    echo 'cd /app/digi-twin-studio && nohup npm run proxy > /tmp/proxy.log 2>&1 &' >> /root/start_pib.sh && \
+    echo '' >> /root/start_pib.sh && \
+    echo '# Start Digi-Twin Studio Angular Frontend in background' >> /root/start_pib.sh && \
+    echo 'cd /app/digi-twin-studio && nohup npm run start -- --host=0.0.0.0 --port=4201 --disable-host-check > /tmp/digi-twin.log 2>&1 &' >> /root/start_pib.sh && \
+    echo '' >> /root/start_pib.sh && \
     echo '# Start the main command' >> /root/start_pib.sh && \
     echo 'exec "$@"' >> /root/start_pib.sh && \
     chmod +x /root/start_pib.sh
@@ -147,7 +164,7 @@ RUN echo '#!/bin/bash' > /root/start_pib.sh && \
 RUN find /opt/pib-venv -name "EKF.py" -exec sed -i 's/from scipy import integrate, randn/from scipy import integrate\nfrom numpy.random import randn/' {} \;
 
 # Expose ports
-EXPOSE 8000 8888 11311 4200
+EXPOSE 8000 8888 11311 4200 4201 3001
 
 # Default command
 ENTRYPOINT ["/root/start_pib.sh"]

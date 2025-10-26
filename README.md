@@ -47,6 +47,8 @@ start .\dashboard.html
 
 - **Jupyter Lab:** <http://localhost:8888> ⭐ **Hauptzugang**
 - **Cerebra Frontend:** <http://localhost:4200> 🧠 **Roboter-UI**
+- **Cerebra Digi-Twin:** <http://localhost:4201> 🤖 **Webots Integration**
+- **Digi-Twin Proxy:** <http://localhost:3001> 🔗 **API Gateway**
 - **Dashboard:** Öffnen Sie `dashboard.html` im Browser
 
 ## Nützliche Befehle
@@ -112,6 +114,21 @@ ros2 service list
 python3 -c "from pib_sdk import control; print('PIB-SDK OK')"
 ```
 
+### Cerebra Digi-Twin Studio
+```bash
+# Cerebra Digi-Twin Service starten
+docker-compose --profile cerebra-digi-twin up
+
+# Nur Proxy Server (für Webots/Onshape Integration)
+cd /app/cerebra-digi-twin && npm run proxy
+
+# Frontend separat starten
+cd /app/cerebra-digi-twin && npm start
+
+# Webots Status prüfen
+curl http://localhost:3001/webots/status
+```
+
 ## Installierte Pakete
 
 ### Wissenschaftliche Bibliotheken
@@ -143,6 +160,14 @@ python3 -c "from pib_sdk import control; print('PIB-SDK OK')"
 - **ROS2 Integration** über roslibjs und ROSBridge
 - **Live-Development** mit Hot-Reload
 - **Service Monitoring Dashboard** mit Auto-Refresh
+
+### Cerebra Digi-Twin Studio (NEU)
+
+- **Webots Integration** - Direkte Verbindung zu Webots Simulator (Windows)
+- **Onshape CAD API** - Import von 3D-Modellen und Assemblies
+- **CORS Proxy Server** - Überbrückt Browser-Sicherheitsbeschränkungen
+- **PIB-Webots Bridge** - Steuert PIB-Roboter in Webots-Simulation
+- **Real-time WebSocket** - Bidirektionale Kommunikation Container ↔ Webots
 
 ### Kommunikation & Integration
 
