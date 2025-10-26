@@ -198,6 +198,11 @@ curl http://localhost:3001/webots/status
 4. **GPU-Unterstützung:** Uncommentieren Sie die GPU-Konfiguration in `docker-compose.yml` falls benötigt
 5. **PIB Notebook:** Verwenden Sie `test_notebook.ipynb` für vollständige PIB-SDK Funktionsreferenz
 
+## Digitaler Zwilling
+Python PIB-SDK ←→ ROS2 ←→ WebSocket ←→ Webots Simulator
+     ↕️           ↕️        ↕️              ↕️
+ Roboter-Code  ROS Topics   Web-Bridge   3D-Simulation
+
 ## Troubleshooting
 
 ### Jupyter startet nicht
@@ -225,35 +230,7 @@ docker exec -it pib-sdk-container pip install paket-name
 docker-compose build
 ```
 
-## 🔄 Neue Features in dieser ROS2-Version
 
-### Technische Upgrades
-- ✅ **Ubuntu 24.04 LTS** statt Ubuntu 20.04
-- ✅ **ROS2 Jazzy** statt ROS Noetic  
-- ✅ **Python 3.11** für PIB-SDK Kompatibilität
-- ✅ **PIB-SDK PR-978** mit Speech-Modul
-- ✅ **Scipy Kompatibilität** - automatischer randn() Patch
-
-### Funktionale Verbesserungen
-- ✅ **Dashboard Auto-Refresh** - automatische Service-Überwachung nach Timeouts
-- ✅ **Zero-ROS Integration** - PIB-SDK funktioniert ohne ROS2-Setup
-- ✅ **Vollständiges PIB-Notebook** - alle Funktionen dokumentiert und getestet
-- ✅ **Robuste Fehlerbehandlung** - automatische Kompatibilitäts-Patches
-
-### Migration von ROS Noetic
-Falls Sie von der alten ROS Noetic Version migrieren:
-
-```bash
-# Alten Container stoppen und entfernen
-docker-compose down
-docker rmi pib-sdk-lab:latest
-
-# Neue Version bauen
-docker-compose build
-
-# Mit neuer ROS2-Umgebung starten
-docker-compose up -d
-```
 
 **⚠️ Wichtiger Hinweis:** ROS2 verwendet andere Topics/Services als ROS1. Bestehender ROS1-Code muss für ROS2 angepasst werden.
 
