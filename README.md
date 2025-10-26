@@ -1,10 +1,18 @@
 # PIB SDK Docker Lab + Cerebra - Vollständige Robotics-Entwicklungsumgebung
 
-Dieses Projekt ermöglicht es Ihnen, mit Python, ROS und der Cerebra-Weboberfläche aus dem Docker-Container heraus im Browser zu arbeiten. Der Container enthält ROS Noetic, Jupyter Lab für interaktive Entwicklung und das Cerebra Angular Frontend für die Roboter-Benutzeroberfläche.
+Dieses Projekt ermöglicht es Ihnen, mit Python, ROS2 und der Cerebra-Weboberfläche aus dem Docker-Container heraus im Browser zu arbeiten. Der Container basiert auf Ubuntu 24.04 LTS und enthält ROS2 Jazzy, Python 3.11, Jupyter Lab für interaktive Entwicklung und das Cerebra Angular Frontend für die Roboter-Benutzeroberfläche.
 
-Systemvoraussetzungen:
-- Docker Desktop
-- min. 12 GB Festplattenplatz
+## Systemvoraussetzungen
+- **Docker Desktop** (empfohlen: neueste Version)
+- **Mindestens 12 GB freier Festplattenplatz**
+- **Arbeitsspeicher:** 8 GB RAM empfohlen für optimale Performance
+
+## Technische Basis
+- **Ubuntu 24.04 LTS** als Base Image
+- **ROS2 Jazzy Jalopy** (neueste LTS-Version) 
+- **Python 3.11** (kompatibel mit PIB-SDK <3.12 Requirement)
+- **PIB-SDK PR-978** mit Speech-Modul Support
+- **Robotics Toolbox** mit scipy.randn Kompatibilitäts-Patches
 
 🚀
 
@@ -15,7 +23,7 @@ docker-compose build
 ```
 oder
 ```bash
-docker build -t pib-sdk-lab:latest
+docker build -t pib-sdk-lab:latest .
 ```
 
 ## Container starten
@@ -24,7 +32,7 @@ docker-compose up -d
 ```
 oder
 ```bash
-docker run -d --name pib-sdk-container -p 8888:8888 -p 4200:4200 -p 8000:8000 -p 8080:8080 -p 11311:11311 pib-sdk-lab
+docker run -d --name pib-sdk-container -p 8888:8888 -p 4200:4200 -p 8000:8000 -p 8080:8080 -p 11311:11311 pib-sdk-lab:latest
 ```
 Danach kann über das Dashboard geschaut werden, ob die Dienste laufen und man kann diese direkt im Browser starten
 ```powershell
@@ -83,6 +91,27 @@ docker-compose --profile dev run pib-dev /bin/bash
 jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root
 ```
 
+### ROS2-spezifische Befehle
+```bash
+# ROS2 Environment aktivieren
+source /opt/ros/jazzy/setup.bash
+
+# PIB Python Environment aktivieren  
+source /opt/pib-venv/bin/activate
+
+# ROSBridge für WebSocket-Kommunikation starten
+ros2 launch rosbridge_server rosbridge_websocket_launch.xml
+
+# ROS2 Topics anzeigen
+ros2 topic list
+
+# ROS2 Services anzeigen  
+ros2 service list
+
+# PIB-SDK im Container testen
+python3 -c "from pib_sdk import control; print('PIB-SDK OK')"
+```
+
 ## Installierte Pakete
 
 ### Wissenschaftliche Bibliotheken
@@ -90,13 +119,15 @@ jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root
 - OpenCV für Computer Vision
 - Pillow für Bildverarbeitung
 
-### Robotik & ROS
+### Robotik & ROS2
 
-- **ROS Noetic** (Robot Operating System)
-- Robotics Toolbox Python
-- Spatial Math Python
-- PIB SDK
-- ROS Python Libraries (rospy, geometry_msgs, sensor_msgs, etc.)
+- **ROS2 Jazzy Jalopy** (Robot Operating System 2 - LTS Version)
+- **Python 3.11** Virtual Environment (/opt/pib-venv)
+- **PIB SDK PR-978** mit Speech-Modul Integration
+- **Robotics Toolbox Python** mit scipy.randn Kompatibilitäts-Patch
+- **Spatial Math Python** für 3D-Transformationen
+- **ROS2 Python Libraries** (rclpy, geometry_msgs, sensor_msgs, etc.)
+- **ROSBridge Suite** für WebSocket-Kommunikation
 
 ### Web-Entwicklung
 
@@ -109,21 +140,37 @@ jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root
 
 - **Angular 18** Frontend für PIB-Roboter
 - **Material Design** Benutzeroberfläche
-- **ROS Integration** über roslib
+- **ROS2 Integration** über roslibjs und ROSBridge
 - **Live-Development** mit Hot-Reload
+- **Service Monitoring Dashboard** mit Auto-Refresh
 
-### Kommunikation
+### Kommunikation & Integration
 
-- WebSockets
-- ROS LibPy
-- ROS Topics, Services & Actions
+- **WebSockets** für Echtzeit-Kommunikation
+- **ROSLibPy** für Python-ROS2 Integration
+- **ROS2 Topics, Services & Actions** vollständig unterstützt
+- **PIB Speech Module** für Voice Assistant Integration
+- **Zero-ROS SDK** - PIB-SDK funktioniert ohne ROS-Environment
 
-## Tipps
+## Wichtige Hinweise
+
+### Python Version Kompatibilität
+- **PIB-SDK benötigt Python ≥3.9, <3.12** 
+- **Python 3.14 ist NICHT kompatibel** (automatische Installation in neuen Raspberry Pi OS)
+- Container verwendet **Python 3.11** für optimale Kompatibilität
+
+### ROS2-spezifische Features
+- **Zero-ROS SDK:** PIB-SDK funktioniert ohne ROS2-Environment-Setup
+- **ROSBridge WebSockets** für Browser-Integration auf Port 9090
+- **Service Discovery:** Dashboard überwacht automatisch alle Services
+
+### Entwicklungstipps
 
 1. **Kein Token/Passwort:** Jupyter ist für lokale Entwicklung ohne Authentifizierung konfiguriert
 2. **Live-Reload:** Ihr Code-Verzeichnis ist als Volume gemountet - Änderungen werden sofort übernommen
 3. **Port-Konflikte:** Falls ein Port belegt ist, können Sie ihn in `docker-compose.yml` ändern
 4. **GPU-Unterstützung:** Uncommentieren Sie die GPU-Konfiguration in `docker-compose.yml` falls benötigt
+5. **PIB Notebook:** Verwenden Sie `test_notebook.ipynb` für vollständige PIB-SDK Funktionsreferenz
 
 ## Troubleshooting
 
@@ -150,8 +197,40 @@ docker exec -it pib-sdk-container pip install paket-name
 
 # Oder requirements.txt erweitern und neu bauen
 docker-compose build
-
 ```
+
+## 🔄 Neue Features in dieser ROS2-Version
+
+### Technische Upgrades
+- ✅ **Ubuntu 24.04 LTS** statt Ubuntu 20.04
+- ✅ **ROS2 Jazzy** statt ROS Noetic  
+- ✅ **Python 3.11** für PIB-SDK Kompatibilität
+- ✅ **PIB-SDK PR-978** mit Speech-Modul
+- ✅ **Scipy Kompatibilität** - automatischer randn() Patch
+
+### Funktionale Verbesserungen
+- ✅ **Dashboard Auto-Refresh** - automatische Service-Überwachung nach Timeouts
+- ✅ **Zero-ROS Integration** - PIB-SDK funktioniert ohne ROS2-Setup
+- ✅ **Vollständiges PIB-Notebook** - alle Funktionen dokumentiert und getestet
+- ✅ **Robuste Fehlerbehandlung** - automatische Kompatibilitäts-Patches
+
+### Migration von ROS Noetic
+Falls Sie von der alten ROS Noetic Version migrieren:
+
+```bash
+# Alten Container stoppen und entfernen
+docker-compose down
+docker rmi pib-sdk-lab:latest
+
+# Neue Version bauen
+docker-compose build
+
+# Mit neuer ROS2-Umgebung starten
+docker-compose up -d
+```
+
+**⚠️ Wichtiger Hinweis:** ROS2 verwendet andere Topics/Services als ROS1. Bestehender ROS1-Code muss für ROS2 angepasst werden.
+
 
 
 

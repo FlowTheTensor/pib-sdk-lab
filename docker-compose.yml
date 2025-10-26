@@ -12,12 +12,12 @@ services:
       - "8000:8000"   # Your main application
       - "8080:8080"   # Alternative web service
       - "8888:8888"   # Jupyter Notebook/Lab
-      - "11311:11311" # ROS Master
+      - "11311:11311" # ROS2 Discovery (legacy port for compatibility)
       - "4200:4200"   # Cerebra Angular Frontend
     environment:
-      - PYTHONPATH=/app:/opt/ros/noetic/lib/python3/dist-packages
-      - ROS_MASTER_URI=http://localhost:11311
-      - ROS_HOSTNAME=localhost
+      - PYTHONPATH=/app:/opt/ros/jazzy/lib/python3.11/site-packages:/opt/pib-venv/lib/python3.11/site-packages
+      - ROS_DOMAIN_ID=0
+      - RMW_IMPLEMENTATION=rmw_cyclonedx_cpp
       - DISPLAY=${DISPLAY:-:0}  # For GUI applications if needed
     # Uncomment if you need GPU access
     # deploy:

@@ -344,7 +344,7 @@
                 .catch((error) => {
                     clearTimeout(timeoutId);
                     if (error.name === 'AbortError') {
-                        element.innerHTML = '⚠️ Timeout (>5s)';
+                        element.innerHTML = '⚠️ Timeout (>5s). Braucht nach Start des Containers bis zu einer Minute.';
                         element.style.color = '#ff9800';
                     } else {
                         element.innerHTML = '🔴 Offline';
@@ -370,18 +370,23 @@
             if (refreshTimer) clearInterval(refreshTimer);
             if (countdownTimer) clearInterval(countdownTimer);
             
-            // Starte neuen Timer
-            refreshTimer = setInterval(checkAllServices, refreshInterval * 1000);
+            // Starte neuen Timer - wiederhole alle refreshInterval Sekunden
+            refreshTimer = setInterval(() => {
+                checkAllServices();
+            }, refreshInterval * 1000);
             
-            // Starte Countdown
-            let lastCheckTime = Date.now();
+            // Starte Countdown-Timer der jede Sekunde läuft
+            let nextCheckTime = Date.now() + (refreshInterval * 1000);
             countdownTimer = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - lastCheckTime) / 1000);
-                const remaining = refreshInterval - (elapsed % refreshInterval);
-                document.getElementById('countdown').textContent = `Nächster Check in: ${remaining}s`;
+                const now = Date.now();
+                const remaining = Math.max(0, Math.ceil((nextCheckTime - now) / 1000));
                 
-                if (remaining === refreshInterval) {
-                    lastCheckTime = Date.now();
+                if (remaining <= 0) {
+                    // Zeit für neuen Check - setze neue Zielzeit
+                    nextCheckTime = now + (refreshInterval * 1000);
+                    document.getElementById('countdown').textContent = `Nächster Check in: ${refreshInterval}s`;
+                } else {
+                    document.getElementById('countdown').textContent = `Nächster Check in: ${remaining}s`;
                 }
             }, 1000);
         }

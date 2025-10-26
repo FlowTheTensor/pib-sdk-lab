@@ -1,5 +1,5 @@
-# Dockerfile for PIB SDK with Python 3.9, ROS Noetic - Conflict-Free Version
-FROM osrf/ros:noetic-desktop-full
+# Dockerfile for PIB SDK with Python 3.11, ROS2 Jazzy on Ubuntu 24.04 LTS
+FROM osrf/ros:jazzy-desktop-full-noble
 
 # Set working directory
 WORKDIR /app
@@ -7,17 +7,18 @@ WORKDIR /app
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
-ENV ROS_DISTRO=noetic
-ENV ROS_VERSION=1
+ENV ROS_DISTRO=jazzy
+ENV ROS_VERSION=2
 ENV ROS_PYTHON_VERSION=3
 ENV PIP_NO_WARN_SCRIPT_LOCATION=1
 
-# Install Python 3.9, Node.js and system dependencies
-RUN apt-get update && apt-get install -y \
-    python3.9 \
-    python3.9-dev \
-    python3.9-distutils \
-    python3.9-venv \
+# Add deadsnakes PPA for Python 3.11 and install Python 3.11, Node.js and system dependencies
+RUN apt-get update && apt-get install -y software-properties-common \
+    && add-apt-repository ppa:deadsnakes/ppa \
+    && apt-get update && apt-get install -y \
+    python3.11 \
+    python3.11-dev \
+    python3.11-venv \
     python3-pip \
     gcc \
     g++ \
@@ -35,61 +36,60 @@ RUN apt-get update && apt-get install -y \
     libxslt-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js 18.x for Cerebra frontend
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+# Install Node.js 20.x for Cerebra frontend (latest LTS)
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
     && node --version \
     && npm --version
 
-# Create virtual environment to avoid conflicts with ROS packages
-RUN python3.9 -m venv /opt/pib-venv
+# Create virtual environment to avoid conflicts with ROS2 packages
+RUN python3.11 -m venv /opt/pib-venv
 ENV PATH="/opt/pib-venv/bin:$PATH"
 ENV VIRTUAL_ENV="/opt/pib-venv"
 
 # Upgrade pip in virtual environment
 RUN /opt/pib-venv/bin/pip install --upgrade pip
 
-# Install core scientific packages
+# Install core scientific packages (latest versions)
 RUN /opt/pib-venv/bin/pip install --no-cache-dir \
-    numpy==1.24.3 \
-    scipy==1.10.1 \
-    matplotlib==3.7.2
+    numpy \
+    scipy \
+    matplotlib
 
-# Install computer vision packages
+# Install computer vision packages (latest versions)
 RUN /opt/pib-venv/bin/pip install --no-cache-dir \
-    opencv-python==4.8.1.78 \
-    opencv-contrib-python==4.8.1.78 \
-    pillow==10.0.1
+    opencv-python \
+    opencv-contrib-python \
+    pillow
 
-# Install robotics packages
+# Install networking packages (rclpy is already included with ROS2)
 RUN /opt/pib-venv/bin/pip install --no-cache-dir \
-    roboticstoolbox-python==1.1.0 \
-    spatialmath-python==1.1.14 \
-    spatialgeometry==1.1.0 \
-    pgraph-python==0.6.3 \
-    ansitable==0.11.4 \
-    colored==2.3.1 \
-    progress==1.6.1
+    websockets
 
-# Install networking packages
+# Install PyYAML compatible with ROS2
+RUN /opt/pib-venv/bin/pip install --no-cache-dir --upgrade pyyaml
+
+# Install Jupyter and web packages (latest versions)
 RUN /opt/pib-venv/bin/pip install --no-cache-dir \
-    websockets==11.0.3 \
-    roslibpy==2.0.0
+    jupyter \
+    jupyterlab \
+    notebook \
+    ipywidgets \
+    plotly \
+    bokeh
 
-# Install PyYAML compatible with ROS
-RUN /opt/pib-venv/bin/pip install --no-cache-dir --force-reinstall pyyaml==6.0.1
+# Install PIB SDK from PR-978 branch (includes speech module)
+RUN /opt/pib-venv/bin/pip install --no-cache-dir --upgrade git+https://github.com/pib-rocks/pib-sdk.git@PR-978
 
-# Install Jupyter and web packages
+# Install robotics packages 
 RUN /opt/pib-venv/bin/pip install --no-cache-dir \
-    jupyter==1.0.0 \
-    jupyterlab==4.0.7 \
-    notebook==7.0.6 \
-    ipywidgets==8.1.1 \
-    plotly==5.17.0 \
-    bokeh==3.3.0
-
-# Install PIB SDK
-RUN /opt/pib-venv/bin/pip install --no-cache-dir pib-sdk==0.2
+    roboticstoolbox-python \
+    spatialmath-python \
+    spatialgeometry \
+    pgraph-python \
+    ansitable \
+    colored \
+    progress
 
 # Copy test notebook for Jupyter
 COPY test_notebook.ipynb /app/
@@ -110,25 +110,25 @@ WORKDIR /app
 # Create Jupyter configuration directory
 RUN mkdir -p /root/.jupyter
 
-# Setup environment for both ROS and virtual environment
-RUN echo 'source /opt/ros/noetic/setup.bash' >> /root/.bashrc && \
+# Setup environment for both ROS2 and virtual environment
+RUN echo 'source /opt/ros/jazzy/setup.bash' >> /root/.bashrc && \
     echo 'source /opt/pib-venv/bin/activate' >> /root/.bashrc && \
-    echo 'export PYTHONPATH=/opt/ros/noetic/lib/python3/dist-packages:$PYTHONPATH' >> /root/.bashrc
+    echo 'export PYTHONPATH=/opt/ros/jazzy/lib/python3.11/site-packages:$PYTHONPATH' >> /root/.bashrc
 
 # Generate Jupyter config
-RUN /opt/pib-venv/bin/jupyter notebook --generate-config && \
-    echo "c.NotebookApp.ip = '0.0.0.0'" >> /root/.jupyter/jupyter_notebook_config.py && \
-    echo "c.NotebookApp.port = 8888" >> /root/.jupyter/jupyter_notebook_config.py && \
-    echo "c.NotebookApp.open_browser = False" >> /root/.jupyter/jupyter_notebook_config.py && \
-    echo "c.NotebookApp.allow_root = True" >> /root/.jupyter/jupyter_notebook_config.py && \
-    echo "c.NotebookApp.token = ''" >> /root/.jupyter/jupyter_notebook_config.py && \
-    echo "c.NotebookApp.password = ''" >> /root/.jupyter/jupyter_notebook_config.py
+RUN /opt/pib-venv/bin/jupyter lab --generate-config && \
+    echo "c.ServerApp.ip = '0.0.0.0'" >> /root/.jupyter/jupyter_lab_config.py && \
+    echo "c.ServerApp.port = 8888" >> /root/.jupyter/jupyter_lab_config.py && \
+    echo "c.ServerApp.open_browser = False" >> /root/.jupyter/jupyter_lab_config.py && \
+    echo "c.ServerApp.allow_root = True" >> /root/.jupyter/jupyter_lab_config.py && \
+    echo "c.ServerApp.token = ''" >> /root/.jupyter/jupyter_lab_config.py && \
+    echo "c.ServerApp.password = ''" >> /root/.jupyter/jupyter_lab_config.py
 
-# Create startup script that sources both ROS and virtual env, and starts all services
+# Create startup script that sources both ROS2 and virtual env, and starts all services
 RUN echo '#!/bin/bash' > /root/start_pib.sh && \
-    echo 'source /opt/ros/noetic/setup.bash' >> /root/start_pib.sh && \
+    echo 'source /opt/ros/jazzy/setup.bash' >> /root/start_pib.sh && \
     echo 'source /opt/pib-venv/bin/activate' >> /root/start_pib.sh && \
-    echo 'export PYTHONPATH=/opt/ros/noetic/lib/python3/dist-packages:$PYTHONPATH' >> /root/start_pib.sh && \
+    echo 'export PYTHONPATH=/opt/ros/jazzy/lib/python3.11/site-packages:$PYTHONPATH' >> /root/start_pib.sh && \
     echo '' >> /root/start_pib.sh && \
     echo '# Start Cerebra JSON Server Backend in background' >> /root/start_pib.sh && \
     echo 'cd /app/cerebra && nohup node ./server/json-server-funktion.mjs > /tmp/backend.log 2>&1 &' >> /root/start_pib.sh && \
@@ -142,6 +142,9 @@ RUN echo '#!/bin/bash' > /root/start_pib.sh && \
     echo '# Start the main command' >> /root/start_pib.sh && \
     echo 'exec "$@"' >> /root/start_pib.sh && \
     chmod +x /root/start_pib.sh
+
+# randn FIX:
+RUN find /opt/pib-venv -name "EKF.py" -exec sed -i 's/from scipy import integrate, randn/from scipy import integrate\nfrom numpy.random import randn/' {} \;
 
 # Expose ports
 EXPOSE 8000 8888 11311 4200
