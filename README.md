@@ -200,8 +200,6 @@ curl http://localhost:3001/webots/status
 
 ## Digitaler Zwilling
 Python PIB-SDK ←→ ROS2 ←→ WebSocket ←→ Webots Simulator
-     ↕️           ↕️        ↕️              ↕️
- Roboter-Code  ROS Topics   Web-Bridge   3D-Simulation
 
 ## Troubleshooting
 

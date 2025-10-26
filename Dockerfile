@@ -91,8 +91,11 @@ RUN /opt/pib-venv/bin/pip install --no-cache-dir \
     colored \
     progress
 
-# Clone Digi-Twin Studio from GitHub (original files)
+# Clone PIB Backend from PR-961 branch (neueste Webots Integration)
 WORKDIR /app
+RUN git clone -b PR-961 --depth 1 https://github.com/pib-rocks/pib-backend.git pib-backend
+
+# Clone Digi-Twin Studio from GitHub (original files)
 RUN git clone https://github.com/pib-rocks/digi-twin-studio.git digi-twin-studio
 
 # Install Digi-Twin Studio dependencies
@@ -121,8 +124,13 @@ WORKDIR /app
 # Create Jupyter configuration directory
 RUN mkdir -p /root/.jupyter
 
+# Build PIB ROS2 Workspace
+WORKDIR /app/pib-backend
+RUN /bin/bash -c 'source /opt/ros/jazzy/setup.bash && colcon build --packages-select pibsim_webots --symlink-install'
+
 # Setup environment for both ROS2 and virtual environment
 RUN echo 'source /opt/ros/jazzy/setup.bash' >> /root/.bashrc && \
+    echo 'source /app/pib-backend/install/setup.bash' >> /root/.bashrc && \
     echo 'source /opt/pib-venv/bin/activate' >> /root/.bashrc && \
     echo 'export PYTHONPATH=/opt/ros/jazzy/lib/python3.11/site-packages:$PYTHONPATH' >> /root/.bashrc
 
@@ -138,8 +146,12 @@ RUN /opt/pib-venv/bin/jupyter lab --generate-config && \
 # Create startup script that sources both ROS2 and virtual env, and starts all services
 RUN echo '#!/bin/bash' > /root/start_pib.sh && \
     echo 'source /opt/ros/jazzy/setup.bash' >> /root/start_pib.sh && \
+    echo 'source /app/pib-backend/install/setup.bash' >> /root/start_pib.sh && \
     echo 'source /opt/pib-venv/bin/activate' >> /root/start_pib.sh && \
     echo 'export PYTHONPATH=/opt/ros/jazzy/lib/python3.11/site-packages:$PYTHONPATH' >> /root/start_pib.sh && \
+    echo '' >> /root/start_pib.sh && \
+    echo '# Start ROS2 Bridge for Webots in background' >> /root/start_pib.sh && \
+    echo 'nohup ros2 launch rosbridge_server rosbridge_websocket_launch.xml port:=9090 > /tmp/rosbridge.log 2>&1 &' >> /root/start_pib.sh && \
     echo '' >> /root/start_pib.sh && \
     echo '# Start Cerebra JSON Server Backend in background' >> /root/start_pib.sh && \
     echo 'cd /app/cerebra && nohup node ./server/json-server-funktion.mjs > /tmp/backend.log 2>&1 &' >> /root/start_pib.sh && \
@@ -157,14 +169,19 @@ RUN echo '#!/bin/bash' > /root/start_pib.sh && \
     echo 'cd /app/digi-twin-studio && nohup npm run start -- --host=0.0.0.0 --port=4201 --disable-host-check > /tmp/digi-twin.log 2>&1 &' >> /root/start_pib.sh && \
     echo '' >> /root/start_pib.sh && \
     echo '# Start the main command' >> /root/start_pib.sh && \
-    echo 'exec "$@"' >> /root/start_pib.sh && \
+    echo 'if [ $# -gt 0 ]; then' >> /root/start_pib.sh && \
+    echo '  exec "$@"' >> /root/start_pib.sh && \
+    echo 'else' >> /root/start_pib.sh && \
+    echo '  echo "All services started. Container running..."' >> /root/start_pib.sh && \
+    echo '  tail -f /tmp/*.log' >> /root/start_pib.sh && \
+    echo 'fi' >> /root/start_pib.sh && \
     chmod +x /root/start_pib.sh
 
 # randn FIX:
 RUN find /opt/pib-venv -name "EKF.py" -exec sed -i 's/from scipy import integrate, randn/from scipy import integrate\nfrom numpy.random import randn/' {} \;
 
 # Expose ports
-EXPOSE 8000 8888 11311 4200 4201 3001
+EXPOSE 8000 8888 11311 4200 4201 3001 9090
 
 # Default command
 ENTRYPOINT ["/root/start_pib.sh"]

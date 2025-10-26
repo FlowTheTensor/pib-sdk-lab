@@ -18,6 +18,7 @@ services:
       - "4200:4200"   # Cerebra Angular Frontend
       - "4201:4201"   # Digi-Twin Studio Angular Frontend
       - "3001:3001"   # CORS Proxy Server for Onshape API
+      - "9090:9090"   # ROSBridge WebSocket for Webots
     environment:
       - PYTHONPATH=/app:/opt/ros/jazzy/lib/python3.11/site-packages:/opt/pib-venv/lib/python3.11/site-packages
       - ROS_DOMAIN_ID=0
