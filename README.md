@@ -1,3 +1,4 @@
+![PIB Logo](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAI/h+RrBwAAAABJRU5ErkJggg==)
 # PIB SDK Docker Lab + Cerebra - Vollständige Robotics-Entwicklungsumgebung
 
 Dieses Projekt ermöglicht es Ihnen, mit Python, ROS2 und der Cerebra-Weboberfläche aus dem Docker-Container heraus im Browser zu arbeiten. Der Container basiert auf Ubuntu 24.04 LTS und enthält ROS2 Jazzy, Python 3.11, Jupyter Lab für interaktive Entwicklung und das Cerebra Angular Frontend für die Roboter-Benutzeroberfläche.
