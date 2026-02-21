@@ -11,25 +11,25 @@ Im aktuellen Setup läuft im PIB-SDK-Container sowohl Jupyter Lab als auch die r
 
 ### Kommunikationsfluss
 
-```mermaid
-flowchart TD
-  subgraph PIB-SDK-Container
-    Jupyter[Jupyter Lab]
-    Bridge[ros1_bridge]
-    SDK[PIB SDK (ROS1)]
-  end
-  subgraph PIB (Raspberry Pi)
-    ROS2[ROS2 Node(s)]
-    Rosbridge[rosbridge_server (WebSocket)]
-  end
-  Jupyter --> SDK
-  SDK --> Bridge
-  Bridge -- ROS2-Kommandos --> Rosbridge
-  Rosbridge --> ROS2
-  Bridge -- ROS1-Kommandos <--> SDK
-  Rosbridge -- WebSocket <--> SDK
-  note over Bridge,ROS2: ros1_bridge übersetzt ROS1-Kommandos zu ROS2
-  note over Rosbridge,ROS2: rosbridge_server ermöglicht WebSocket-Kommunikation mit ROS2
+```
+   +---------------------+           +--------------------------+
+   | PIB-SDK-Container   |           |   PIB (Raspberry Pi)     |
+   |---------------------|           |--------------------------|
+   |  Jupyter Lab        |           |  ROS2 im Container       |
+   |  PIB SDK (ROS1)     |<--------->|    multirepo-rosbridge-ws|
+   |  ros1_bridge        |           |    ROS2 Node(s)          |
+   +---------------------+           +--------------------------+
+           |   |                               ^
+           |   +-------------------------------+
+           | liefert passende ROS2-Nachrichten |
+           +-----------------------------------+
+
+Kommunikationsfluss:
+- Jupyter Lab sendet Kommandos an PIB SDK (ROS1)
+- PIB SDK (ROS1) kommuniziert mit ros1_bridge
+- ros1_bridge übersetzt ROS1-Kommandos zu ROS2
+- rosbridge_server auf dem PIB empfängt ROS2-Kommandos (WebSocket)
+- ROS2 Node(s) auf dem PIB führen die Befehle aus
 ```
 
 **Hinweis:** Damit die Kommunikation funktioniert, muss im Container die ros1_bridge laufen und auf dem PIB der rosbridge_server für ROS2 gestartet sein.
