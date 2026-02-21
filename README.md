@@ -1,5 +1,39 @@
 # PIB SDK Docker Lab + Cerebra - Vollständige Robotics-Entwicklungsumgebung
 
+## Architekturübersicht: ROS1-ROS2-Bridge im Container
+
+Im aktuellen Setup läuft im PIB-SDK-Container sowohl Jupyter Lab als auch die ros1_bridge. Damit können ROS1-Kommandos aus dem PIB-SDK über die Bridge an den PIB (Raspberry Pi, ROS2) weitergeleitet werden. Die Kommunikation erfolgt wie folgt:
+
+- **Jupyter Lab** dient als interaktive Entwicklungsumgebung.
+- **PIB SDK** (ROS1) sendet Steuerbefehle.
+- **ros1_bridge** übersetzt ROS1-Kommandos zu ROS2.
+- **rosbridge_server** auf dem PIB ermöglicht WebSocket-Kommunikation mit ROS2.
+
+### Kommunikationsfluss
+
+```mermaid
+flowchart TD
+  subgraph PIB-SDK-Container
+    Jupyter[Jupyter Lab]
+    Bridge[ros1_bridge]
+    SDK[PIB SDK (ROS1)]
+  end
+  subgraph PIB (Raspberry Pi)
+    ROS2[ROS2 Node(s)]
+    Rosbridge[rosbridge_server (WebSocket)]
+  end
+  Jupyter --> SDK
+  SDK --> Bridge
+  Bridge -- ROS2-Kommandos --> Rosbridge
+  Rosbridge --> ROS2
+  Bridge -- ROS1-Kommandos <--> SDK
+  Rosbridge -- WebSocket <--> SDK
+  note over Bridge,ROS2: ros1_bridge übersetzt ROS1-Kommandos zu ROS2
+  note over Rosbridge,ROS2: rosbridge_server ermöglicht WebSocket-Kommunikation mit ROS2
+```
+
+**Hinweis:** Damit die Kommunikation funktioniert, muss im Container die ros1_bridge laufen und auf dem PIB der rosbridge_server für ROS2 gestartet sein.
+
 Dieses Projekt ermöglicht es Ihnen, mit Python, ROS2 und der Cerebra-Weboberfläche aus dem Docker-Container heraus im Browser zu arbeiten. Der Container basiert auf Ubuntu 24.04 LTS und enthält ROS2 Jazzy, Python 3.11, Jupyter Lab für interaktive Entwicklung und das Cerebra Angular Frontend für die Roboter-Benutzeroberfläche.
 
 ## Systemvoraussetzungen
