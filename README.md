@@ -12,17 +12,14 @@ Im aktuellen Setup läuft im PIB-SDK-Container sowohl Jupyter Lab als auch die r
 ### Kommunikationsfluss
 
 ```
-   +---------------------+           +--------------------------+
-   | PIB-SDK-Container   |           |   PIB (Raspberry Pi)     |
-   |---------------------|           |--------------------------|
-   |  Jupyter Lab        |           |  ROS2 im Container       |
-   |  PIB SDK (ROS1)     |<--------->|    multirepo-rosbridge-ws|
-   |  ros1_bridge        |           |    ROS2 Node(s)          |
-   +---------------------+           +--------------------------+
-           |   |                               ^
-           |   +-------------------------------+
-           | liefert passende ROS2-Nachrichten |
-           +-----------------------------------+
+   +=====================+                                         +==========================+
+   | PIB-SDK-Container   |                                         |   PIB (Raspberry Pi)     |
+   |---------------------|                                         |--------------------------|
+   |  Jupyter Lab        |                                         |  ROS2 im Container       |
+   |  PIB SDK (ROS1)     | +-----------------------------------+\  |    multirepo-rosbridge-ws|
+   |  ros1_bridge        | | liefert passende ROS2-Nachrichten | > |    ROS2 Node(s)          |
+   +=====================+ +-----------------------------------+/  +==========================+
+           
 
 Kommunikationsfluss:
 - Jupyter Lab sendet Kommandos an PIB SDK (ROS1)
@@ -265,6 +262,7 @@ docker-compose build
 
 
 **⚠️ Wichtiger Hinweis:** ROS2 verwendet andere Topics/Services als ROS1. Bestehender ROS1-Code muss für ROS2 angepasst werden.
+
 
 
 
